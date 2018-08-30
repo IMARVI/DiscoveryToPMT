@@ -1,0 +1,68 @@
+
+//Metodo para NRT
+app.post('/api/save', function(req,res){
+  console.log(JSON.stringify(req.body.log));
+  var fullText ="";
+  var dataDiscovery={};
+
+  for(var i=0;req.body.log.intents[i]!=undefined;i++)
+    fullText += req.body.log.intents[i].text;
+
+  dataDiscovery.fur  = req.body.log.fur;
+  dataDiscovery.text = fullText;
+  //guardamos el fur y el texto de nuestra llamada en discovery
+  discovery.addJsonDocument({ environment_id: 'c2c97c85-777d-48ed-ba23-b49c525f1e30', collection_id: 'c249478e-251a-40f8-bfdf-57f725ee3d83', file: dataDiscovery },
+
+  //Actualizamos el daily fur, concatenando el nuevo fur  
+  function(error, data) {
+    console.log(JSON.stringify(data, null, 2));
+    dailyFurs+=dataDiscovery.fur+"$";
+  if(error)
+    console.log(error);
+  });
+
+  //Creamos conexion con BD
+  var connection = mysql.createConnection(options);
+  var intent;
+
+  connection.connect(function(err){
+    if (err){
+            console.log(err);
+    }
+    else{
+      //se crea la tabla, en caso de ya existir, no pasa nada
+      connection.query(
+        "CREATE TABLE IF NOT EXISTS NRT (id int auto_increment primary key ,fur varchar(256) , resultado varchar(256) NOT NULL, genero varchar(256) NOT NULL, fecha varchar(256) NOT NULL, duracion varchar(256) NOT NULL,intent varchar(256), objecion TEXT NOT NULL, recomendacion TEXT NOT NULL)",
+        function(err, result) {
+          if (err){
+            console.log(err);
+          }
+        }
+      );
+
+      //creamos la query en texto
+      var queryText = "INSERT INTO NRT(fur,resultado,genero,fecha,duracion,intent,objecion,recomendacion) VALUES(?,?,?,?,?,?,?,?)";
+
+      for(var i=0;req.body.log.intents[i]!=undefined;i++){
+        //le ponemos un indicador intent en el caso de exisir
+        if(req.body.log.intents[i].intent!=undefined)
+          intent = req.body.log.intents[i].intent;
+        else intent=null;
+
+        //hacemos la query con los datos en el orden previamente establecido
+        connection.query(
+          queryText,[req.body.log.fur,req.body.log.result,req.body.log.gender,req.body.log.date,req.body.log.duration,intent,req.body.log.intents[i].text,req.body.log.intents[i].answer],
+          function(error, result) {
+            if (error) {
+              console.log(error);
+            }
+            else{
+              console.log(result);
+            }
+          }
+        );
+      }
+    }
+  });
+  res.send("Done");
+});
