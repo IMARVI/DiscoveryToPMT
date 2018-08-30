@@ -74,7 +74,6 @@ function addDocumentMySql(fur){
         if (data.results[i].enriched_text!=undefined) {
           var id   = data.results[i].id
           var fur  = data.results[i].fur
-          //var text = data.results[i].enriched_text.
           var sentiment  = data.results[i].enriched_text.sentiment.document.label
           var entities   = {}
 
@@ -121,20 +120,16 @@ function addDocumentMySql(fur){
               if(entities.beneficios!="")
               entities.beneficios = entities.beneficios.substr(0,entities.beneficios.length-1)
             }
-        //var conceptos  = body.results[i].enriched_text.concepts
-        //var categorias = body.results[i].enriched_text.categories
           var doc = {}
           doc.id = id
           doc.fur=fur
           doc.sentiment=sentiment
           doc.entities=entities
-        //doc.conceptos=conceptos
-        //doc.categorias=categorias
           fullDocs.push(doc)
         }
       }
 
-      //una ves que tenemos nuestro arreglo full docs poblado con los datos de discovery comenzamos a poblar la base de datos PMT
+      //una vez que tenemos nuestro arreglo full docs poblado con los datos de discovery comenzamos a poblar la base de datos PMT
      
       //var connection = mysql.createConnection(options); ------Quitar comentario para que funcione correctamente---------
 
@@ -172,7 +167,6 @@ function addDocumentMySql(fur){
                 if (error) {
                     console.log(error);
                 } else {
-                    //console.log("adioli")
                     console.log(result);
                 }
               }
