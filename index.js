@@ -138,7 +138,7 @@ function addDocumentMySql(fur){
         user: 'root',
         password: 'Mini123.',
         database: 'Prueba'
-      });
+});
 
       connection.connect(function(err) {
         if (err) {
